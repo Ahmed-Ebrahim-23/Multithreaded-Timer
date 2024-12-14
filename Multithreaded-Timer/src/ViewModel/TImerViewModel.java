@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class TImerViewModel {
     private TimerServices service;
-    private static int ID = 0;
     private Map<Integer, TimerThread> threads = new HashMap<>();
     private Map<Integer, Timer> timers = new HashMap<>();
 
@@ -20,13 +19,12 @@ public class TImerViewModel {
         this.service = new TimerServices();
     }
 
-    public void addTimer(String label, Duration duration) {
+    public void addTimer(int ID, String label, Duration duration) {
         Timer timer = service.addTimer(ID, label, duration);
         TimerThread thread = new TimerThread(timer);
         threads.put(ID, thread);
         timers.put(ID, timer);
         thread.start();
-        ID++;
         // update gui??
     }
 
