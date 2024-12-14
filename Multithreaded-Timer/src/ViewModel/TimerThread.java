@@ -14,37 +14,78 @@ import java.util.logging.Logger;
  *
  * @author hp
  */
-public class TimerThread extends Thread{
-    private Timer timer;
-    private int ID;
-    private TimerServices service;
-    private Boolean running;
-    
-    public TimerThread(int ID, Timer timer) {
+public class TimerThread extends Thread {
+    private final Timer timer;
+    private final int ID;
+    private final TimerServices service;
+    private volatile boolean running;
+    private volatile boolean paused;
+
+    public TimerThread(Timer timer) {
         this.timer = timer;
-        this.ID = ID;
+        this.ID = timer.getID();
         this.running = true;
+        this.paused = false;
         this.service = new TimerServices();
     }
 
     public Timer getTimer() {
         return timer;
     }
-    
+
     @Override
-    public void run(){
-        while(running && !timer.getRemainingDuration().equals(Duration.ZERO)){
+    public void run() {
+        while (running && !timer.getRemainingDuration().equals(Duration.ZERO)) {
+            synchronized (this) {
+                while (paused) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        Logger.getLogger(TimerThread.class.getName()).log(Level.SEVERE,
+                                "Thread interrupted while paused", e);
+                    }
+                }
+            }
+
+            // Decrease timer by 1 second
             timer.setRemainingDuration(timer.getRemainingDuration().minusSeconds(1));
+
+            // Call the service method (assuming it updates some UI or logs)
             service.startTimer(timer);
+
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TimerThread.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println(
+                        "Timer " + timer.getLabel() + ": " + timer.getRemainingDuration().toSeconds()
+                                + " seconds left.");
+                Thread.sleep(1000); // Wait for 1 second
+            } catch (InterruptedException e) {
+                Logger.getLogger(TimerThread.class.getName()).log(Level.SEVERE, "Thread sleep interrupted", e);
             }
         }
+
+        System.out.println("Timer " + ID + " has finished.");
     }
-    
-    public void stopThread(){
-        this.running = false;
+
+    // Stop the thread completely
+    public void stopThread() {
+        running = false;
+        resumeThread(); // In case it's paused, ensure it can exit
+    }
+
+    // Pause the timer thread
+    public synchronized void pauseThread() {
+        if (!paused) {
+            paused = true;
+            System.out.println("Timer " + ID + " is paused.");
+        }
+    }
+
+    // Resume the timer thread
+    public synchronized void resumeThread() {
+        if (paused) {
+            paused = false;
+            notify(); // Notify the waiting thread to continue
+            System.out.println("Timer " + ID + " is resumed.");
+        }
     }
 }

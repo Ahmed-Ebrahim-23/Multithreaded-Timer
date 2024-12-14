@@ -4,12 +4,22 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 public class Timer {
-    int ID;
-    String label;
-    LocalTime startTime;
-    LocalTime endTime;
-    Duration actualDuration; 
-    Duration remainingDuration; 
+    private int ID;
+    private String label;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private Duration actualDuration;
+    private Duration remainingDuration;
+
+    public Timer(int ID, String label, LocalTime startTime, LocalTime endTime, Duration actualDuration,
+            Duration remainingDuration) {
+        this.ID = ID;
+        this.label = label;
+        this.startTime = startTime != null ? startTime : LocalTime.now();
+        this.endTime = endTime;
+        this.actualDuration = actualDuration != null ? actualDuration : Duration.ZERO;
+        this.remainingDuration = remainingDuration != null ? remainingDuration : Duration.ZERO;
+    }
 
     public int getID() {
         return ID;
@@ -58,6 +68,4 @@ public class Timer {
     public void setRemainingDuration(Duration remainingDuration) {
         this.remainingDuration = remainingDuration;
     }
-    
-    
 }
