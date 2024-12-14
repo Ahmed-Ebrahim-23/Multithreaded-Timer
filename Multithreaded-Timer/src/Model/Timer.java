@@ -11,6 +11,10 @@ public class Timer {
     private Duration actualDuration;
     private Duration remainingDuration;
 
+    public Timer() {
+
+    }
+
     public Timer(int ID, String label, LocalTime startTime, LocalTime endTime, Duration actualDuration,
             Duration remainingDuration) {
         this.ID = ID;

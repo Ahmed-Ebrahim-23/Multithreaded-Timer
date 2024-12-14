@@ -22,7 +22,7 @@ public class TImerViewModel {
 
     public void addTimer(String label, Duration duration) {
         Timer timer = service.addTimer(ID, label, duration);
-        TimerThread thread = new TimerThread(ID, timer);
+        TimerThread thread = new TimerThread(timer);
         threads.put(ID, thread);
         timers.put(ID, timer);
         thread.start();
@@ -40,7 +40,7 @@ public class TImerViewModel {
 
     public void resumeTimer(int ID) {
         Timer timer = timers.get(ID);
-        TimerThread thread = new TimerThread(ID, timer);
+        TimerThread thread = new TimerThread(timer);
         threads.put(ID, thread);
         thread.start();
     }
@@ -48,7 +48,7 @@ public class TImerViewModel {
     public void resetTimer(int ID) {
         Timer timer = timers.get(ID);
         timer.setRemainingDuration(timer.getActualDuration());
-        TimerThread thread = new TimerThread(ID, timer);
+        TimerThread thread = new TimerThread(timer);
         threads.put(ID, thread);
         thread.start();
     }
